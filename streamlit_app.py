@@ -3,6 +3,13 @@ from datetime import datetime
 import pandas as pd
 import streamlit as st
 from supabase import create_client
+import time
+
+
+nuevo_id = int(time.time() * 1000)  # bigint
+data = {"id": nuevo_id, "nombre": nombre.strip(), "precio": float(precio)}
+supabase.table("productos").insert(data).execute()
+
 
 st.set_page_config(page_title="Gestión de Productos", page_icon="📦", layout="wide")
 
