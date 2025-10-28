@@ -8,7 +8,7 @@ st.set_page_config(page_title="Gestión de Productos", page_icon="📦", layout=
 @st.cache_resource
 def init_supabase():
     SUPABASE_URL = "https://jhlvvdidpftgtuwjikuy.supabase.co"
-    SUPABASE_KEY = "Q981GS7IROxszdmA"
+    SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpobHZ2ZGlkcGZ0Z3R1d2ppa3V5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2ODczMTksImV4cCI6MjA3NjI2MzMxOX0.6BuSkxCU4MpfGYhCsUI8ArztYWrDziV-ewGJv1L2kFE"
     return create_client(SUPABASE_URL, SUPABASE_KEY)  # ← AQUÍ ESTABA EL ERROR
 
 supabase = init_supabase()
