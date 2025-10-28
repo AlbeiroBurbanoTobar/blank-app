@@ -88,6 +88,10 @@ with col2:
             with m1:
                 st.metric("Total Productos", int(len(df)))
 
+            with m2:
+                avg_price = df["precio"].mean() if "precio" in df else 0.0
+                st.metric("Precio Promedio", f"${avg_price:.2f}")
+
             with m3:
                 total_price = df["precio"].sum() if "precio" in df else 0.0
                 st.metric("Precio Total", f"${total_price:.2f}")
