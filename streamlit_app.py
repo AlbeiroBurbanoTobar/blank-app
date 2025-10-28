@@ -100,10 +100,3 @@ with col2:
             
     except Exception as e:
         st.error(f"❌ Error al cargar: {str(e)}")
-```
-
-**requirements.txt:**
-```
-streamlit
-supabase
-pandas
