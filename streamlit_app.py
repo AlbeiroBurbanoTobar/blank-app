@@ -5,7 +5,7 @@ import pandas as pd
 import streamlit as st
 from supabase import create_client
 
-st.set_page_config(page_title="Gestión de Productos", page_icon="📦", layout="wide")
+st.set_page_config(page_title="Productos", layout="wide")
 
 # -----------------------------
 # Inicializar Supabase (cache)
@@ -20,7 +20,7 @@ def init_supabase():
 
 supabase = init_supabase()
 
-st.title("📦 Gestión de Productos")
+st.title("PRUEBA")
 
 col1, col2 = st.columns([1, 2])
 
@@ -44,7 +44,7 @@ with col1:
 
         if submit:
             if not nombre or not nombre.strip():
-                st.warning("⚠️ Ingresa un nombre válido")
+                st.warning(" Ingresa un nombre válido")
             else:
                 try:
                     data = {
@@ -53,16 +53,16 @@ with col1:
                         "precio": float(precio),
                     }
                     supabase.table("productos").insert(data).execute()
-                    st.success(f"✅ Producto '{nombre}' agregado")
+                    st.success(f" Producto '{nombre}' agregado")
                     st.rerun()
                 except Exception as e:
-                    st.error(f"❌ Error al insertar: {str(e)}")
+                    st.error(f" Error al insertar: {str(e)}")
 
 # -----------------------------
 # Listado y métricas
 # -----------------------------
 with col2:
-    st.subheader("📋 Lista de Productos")
+    st.subheader("Lista de Productos")
 
     try:
         response = (
@@ -118,7 +118,7 @@ with col2:
             st.divider()
 
             # Eliminar producto
-            with st.expander("🗑️ Eliminar Producto"):
+            with st.expander(" Eliminar Producto"):
                 if "id" not in df.columns:
                     st.error("La tabla no tiene columna 'id'.")
                 else:
@@ -140,7 +140,7 @@ with col2:
                     if st.button("Eliminar", type="secondary", use_container_width=True):
                         try:
                             supabase.table("productos").delete().eq("id", producto_a_eliminar).execute()
-                            st.success("✅ Producto eliminado")
+                            st.success(" Producto eliminado")
                             st.rerun()
                         except Exception as e:
                             st.error(f"❌ Error al eliminar: {str(e)}")
