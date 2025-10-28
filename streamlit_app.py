@@ -7,9 +7,7 @@ from supabase import create_client
 
 st.set_page_config(page_title="Productos", layout="wide")
 
-# -----------------------------
-# Inicializar Supabase (cache)
-# -----------------------------
+
 @st.cache_resource
 def init_supabase():
     SUPABASE_URL = "https://jhlvvdidpftgtuwjikuy.supabase.co"
@@ -24,16 +22,12 @@ st.title("PRUEBA")
 
 col1, col2 = st.columns([1, 2])
 
-# -----------------------------
-# Utilitario: generar ID bigint
-# -----------------------------
+
 def generar_id_bigint():
-    # milisegundos desde epoch -> cabe en BIGINT y es monotónico
+   
     return int(time.time() * 1000)
 
-# -----------------------------
-# Formulario: Agregar producto
-# -----------------------------
+
 with col1:
     st.subheader("+ Agregar Producto")
     with st.form("form_producto", clear_on_submit=True):
@@ -48,7 +42,7 @@ with col1:
             else:
                 try:
                     data = {
-                        "id": generar_id_bigint(),      # requerido por NOT NULL sin default
+                        "id": generar_id_bigint(),      
                         "nombre": nombre.strip(),
                         "precio": float(precio),
                     }
@@ -58,9 +52,7 @@ with col1:
                 except Exception as e:
                     st.error(f" Error al insertar: {str(e)}")
 
-# -----------------------------
-# Listado y métricas
-# -----------------------------
+
 with col2:
     st.subheader("Lista de Productos")
 
@@ -68,7 +60,7 @@ with col2:
         response = (
             supabase.table("productos")
             .select("*")
-            .order("id", desc=True)   # ordenar por id
+            .order("id", desc=True)  
             .execute()
         )
 
@@ -79,11 +71,11 @@ with col2:
         else:
             df = pd.DataFrame(rows)
 
-            # Asegurar tipos
+
             if "precio" in df.columns:
                 df["precio"] = pd.to_numeric(df["precio"], errors="coerce").fillna(0.0)
 
-            # Métricas
+
             m1, m2, m3 = st.columns(3)
             with m1:
                 st.metric("Total Productos", int(len(df)))
@@ -117,7 +109,7 @@ with col2:
 
             st.divider()
 
-            # Eliminar producto
+        
             with st.expander(" Eliminar Producto"):
                 if "id" not in df.columns:
                     st.error("La tabla no tiene columna 'id'.")
