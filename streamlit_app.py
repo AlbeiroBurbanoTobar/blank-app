@@ -1,15 +1,9 @@
+import time
 from datetime import datetime
 
 import pandas as pd
 import streamlit as st
 from supabase import create_client
-import time
-
-
-nuevo_id = int(time.time() * 1000)  # bigint
-data = {"id": nuevo_id, "nombre": nombre.strip(), "precio": float(precio)}
-supabase.table("productos").insert(data).execute()
-
 
 st.set_page_config(page_title="Gestión de Productos", page_icon="📦", layout="wide")
 
@@ -31,6 +25,13 @@ st.title("📦 Gestión de Productos")
 col1, col2 = st.columns([1, 2])
 
 # -----------------------------
+# Utilitario: generar ID bigint
+# -----------------------------
+def generar_id_bigint():
+    # milisegundos desde epoch -> cabe en BIGINT y es monotónico
+    return int(time.time() * 1000)
+
+# -----------------------------
 # Formulario: Agregar producto
 # -----------------------------
 with col1:
@@ -46,8 +47,8 @@ with col1:
                 st.warning("⚠️ Ingresa un nombre válido")
             else:
                 try:
-                    # Con tu esquema: id (int8) autogenerado por la BD
                     data = {
+                        "id": generar_id_bigint(),      # requerido por NOT NULL sin default
                         "nombre": nombre.strip(),
                         "precio": float(precio),
                     }
@@ -67,7 +68,7 @@ with col2:
         response = (
             supabase.table("productos")
             .select("*")
-            .order("id", desc=True)     # ordenar por id (existe en tu tabla)
+            .order("id", desc=True)   # ordenar por id
             .execute()
         )
 
