@@ -1,6 +1,9 @@
+import uuid
+from datetime import datetime
+
+import pandas as pd
 import streamlit as st
 from supabase import create_client
-import pandas as pd
 
 st.set_page_config(page_title="Gestión de Productos", page_icon="📦", layout="wide")
 
@@ -9,9 +12,15 @@ st.set_page_config(page_title="Gestión de Productos", page_icon="📦", layout=
 # -----------------------------
 @st.cache_resource
 def init_supabase():
-    # Usa secrets; no hardcodees credenciales en el código
+
     SUPABASE_URL = "https://jhlvvdidpftgtuwjikuy.supabase.co"
     SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpobHZ2ZGlkcGZ0Z3R1d2ppa3V5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2ODczMTksImV4cCI6MjA3NjI2MzMxOX0.6BuSkxCU4MpfGYhCsUI8ArztYWrDziV-ewGJv1L2kFE"
+
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        raise RuntimeError(
+            "Faltan SUPABASE_URL o SUPABASE_ANON_KEY. "
+            "Configúralos en .streamlit/secrets.toml o hardcodea bajo tu responsabilidad."
+        )
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 supabase = init_supabase()
@@ -37,11 +46,12 @@ with col1:
             else:
                 try:
                     data = {
+                        "id": str(uuid.uuid4()),                 # ← Opción B: generar ID en la app
                         "nombre": nombre.strip(),
                         "precio": float(precio),
-                        # No envíes 'id' ni 'created_at' si tu tabla tiene defaults
+                        "created_at": datetime.now().isoformat()  # puedes quitarlo si tu tabla tiene DEFAULT now()
                     }
-                    response = supabase.table("Productos").insert(data).execute()
+                    supabase.table("Productos").insert(data).execute()
                     st.success(f"✅ Producto '{nombre}' agregado")
                     st.rerun()
                 except Exception as e:
@@ -68,7 +78,7 @@ with col2:
         else:
             df = pd.DataFrame(rows)
 
-            # Asegura tipos correctos
+            # Asegurar tipos
             if "precio" in df.columns:
                 df["precio"] = pd.to_numeric(df["precio"], errors="coerce").fillna(0.0)
             if "created_at" in df.columns:
@@ -87,10 +97,9 @@ with col2:
 
             st.divider()
 
-            # Dataframe para mostrar
+            # Tabla
             mostrar_cols = [c for c in ["id", "nombre", "precio", "created_at"] if c in df.columns]
             display_df = df[mostrar_cols].copy()
-
             if "precio" in display_df:
                 display_df["precio"] = display_df["precio"].apply(lambda x: f"${x:.2f}")
 
@@ -115,7 +124,6 @@ with col2:
                 if "id" not in df.columns:
                     st.error("La tabla no tiene columna 'id'.")
                 else:
-                    # Etiqueta amigable: "Nombre - $precio"
                     opciones = df["id"].tolist()
 
                     def _fmt(x):
