@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime
 
 import pandas as pd
@@ -12,15 +11,10 @@ st.set_page_config(page_title="Gestión de Productos", page_icon="📦", layout=
 # -----------------------------
 @st.cache_resource
 def init_supabase():
-
     SUPABASE_URL = "https://jhlvvdidpftgtuwjikuy.supabase.co"
     SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpobHZ2ZGlkcGZ0Z3R1d2ppa3V5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2ODczMTksImV4cCI6MjA3NjI2MzMxOX0.6BuSkxCU4MpfGYhCsUI8ArztYWrDziV-ewGJv1L2kFE"
-
     if not SUPABASE_URL or not SUPABASE_KEY:
-        raise RuntimeError(
-            "Faltan SUPABASE_URL o SUPABASE_ANON_KEY. "
-            "Configúralos en .streamlit/secrets.toml o hardcodea bajo tu responsabilidad."
-        )
+        raise RuntimeError("Configura SUPABASE_URL y SUPABASE_ANON_KEY.")
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 supabase = init_supabase()
@@ -45,13 +39,12 @@ with col1:
                 st.warning("⚠️ Ingresa un nombre válido")
             else:
                 try:
+                    # Con tu esquema: id (int8) autogenerado por la BD
                     data = {
-                        "id": str(uuid.uuid4()),                 # ← Opción B: generar ID en la app
                         "nombre": nombre.strip(),
                         "precio": float(precio),
-                        "created_at": datetime.now().isoformat()  # puedes quitarlo si tu tabla tiene DEFAULT now()
                     }
-                    supabase.table("Productos").insert(data).execute()
+                    supabase.table("productos").insert(data).execute()
                     st.success(f"✅ Producto '{nombre}' agregado")
                     st.rerun()
                 except Exception as e:
@@ -65,9 +58,9 @@ with col2:
 
     try:
         response = (
-            supabase.table("Productos")
+            supabase.table("productos")
             .select("*")
-            .order("created_at", desc=True)
+            .order("id", desc=True)     # ordenar por id (existe en tu tabla)
             .execute()
         )
 
@@ -81,8 +74,6 @@ with col2:
             # Asegurar tipos
             if "precio" in df.columns:
                 df["precio"] = pd.to_numeric(df["precio"], errors="coerce").fillna(0.0)
-            if "created_at" in df.columns:
-                df["created_at"] = pd.to_datetime(df["created_at"], errors="coerce")
 
             # Métricas
             m1, m2, m3 = st.columns(3)
@@ -98,7 +89,7 @@ with col2:
             st.divider()
 
             # Tabla
-            mostrar_cols = [c for c in ["id", "nombre", "precio", "created_at"] if c in df.columns]
+            mostrar_cols = [c for c in ["id", "nombre", "precio"] if c in df.columns]
             display_df = df[mostrar_cols].copy()
             if "precio" in display_df:
                 display_df["precio"] = display_df["precio"].apply(lambda x: f"${x:.2f}")
@@ -111,9 +102,6 @@ with col2:
                     "id": "ID",
                     "nombre": "Nombre",
                     "precio": "Precio",
-                    "created_at": st.column_config.DatetimeColumn(
-                        "Fecha de Creación", format="DD/MM/YYYY HH:mm"
-                    ),
                 },
             )
 
@@ -141,7 +129,7 @@ with col2:
 
                     if st.button("Eliminar", type="secondary", use_container_width=True):
                         try:
-                            supabase.table("Productos").delete().eq("id", producto_a_eliminar).execute()
+                            supabase.table("productos").delete().eq("id", producto_a_eliminar).execute()
                             st.success("✅ Producto eliminado")
                             st.rerun()
                         except Exception as e:
