@@ -7,8 +7,8 @@ st.set_page_config(page_title="Gestión de Productos", page_icon="📦", layout=
 
 @st.cache_resource
 def init_supabase():
-    url = st.secrets["https://jhlvvdidpftgtuwjikuy.supabase.co"]
-    key = st.secrets["Q981GS7IROxszdmA"]
+    SUPABASE_URL = "https://jhlvvdidpftgtuwjikuy.supabase.co"
+    SUPABASE_KEY = "Q981GS7IROxszdmA"
     return create_client(url, key)
 
 supabase = init_supabase()
