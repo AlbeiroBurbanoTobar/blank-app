@@ -35,7 +35,7 @@ def generar_id_bigint():
 # Formulario: Agregar producto
 # -----------------------------
 with col1:
-    st.subheader("➕ Agregar Producto")
+    st.subheader("+ Agregar Producto")
     with st.form("form_producto", clear_on_submit=True):
         nombre = st.text_input("Nombre del producto")
         precio = st.number_input("Precio", min_value=0.0, step=0.01, format="%.2f")
